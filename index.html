@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script defer src="./tic-tac-toe.js"></script>
+
+    <style>
+        button {
+            font-size: 4rem;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div style="
+                height: 100vh;
+                display: flex; 
+                justify-content: center;
+                align-items: center;">
+
+        <div id="label">
+
+        </div>
+
+        <div style="
+                    display: grid;
+                    grid-template-columns: repeat(3, 100px);
+                    grid-template-rows: repeat(3, 100px);
+                    " id="cells">
+            <!-- 1.1 -->
+            <button data-pos="00"></button>
+            <!-- 1.2 -->
+            <button data-pos="10"></button>
+            <!-- 1.3 -->
+            <button data-pos="20"></button>
+            <!-------------->
+            <!-- 2.1 -->
+            <button data-pos="01"></button>
+            <!-- 2.2 -->
+            <button data-pos="11"></button>
+            <!-- 2.3 -->
+            <button data-pos="21"></button>
+            <!-------------->
+            <!-- 3.1 -->
+            <button data-pos="02"></button>
+            <!-- 3.2 -->
+            <button data-pos="12"></button>
+            <!-- 3.3 -->
+            <button data-pos="22"></button>
+            <!-------------->
+        </div>
+
+    </div>
+
+</body>
+
+</html>
