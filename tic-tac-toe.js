@@ -1,7 +1,12 @@
+const canvas = document.getElementById("canvas");
+/** @type {CanvasRenderingContext2D} */
+const ctx = canvas.getContext("2d");
 const cellsDiv = document.getElementById("cells");
-const cells = cellsDiv.querySelectorAll("button");
 const label = document.getElementById("label");
-
+const s = 200; // Size of each cell.
+const p = 40; // Padding
+const [w, h] = [s * 3, s * 3];
+[canvas.width, canvas.height] = [w, h];
 var game = {
     turn: true,
     board: [
@@ -12,6 +17,7 @@ var game = {
 };
 
 const IsEmpty = (x, y) => !game.board[y][x];
+const areEqual = (arr1, arr2) => (JSON.stringify(arr1) === JSON.stringify(arr2));
 
 const getAvailablePos = () => {
     const temp = [];
@@ -28,8 +34,9 @@ const IsBoardFull = () => {
     } return true;
 }
 
-const areEqual = (arr1, arr2) => {
-    return (JSON.stringify(arr1) === JSON.stringify(arr2));
+const getIndexPos = (x, y) => {
+    const off = canvas.getBoundingClientRect();
+    return [(x - off.x) / s | 0, (y - off.y) / s | 0];
 }
 
 const checkWin = () => {
@@ -55,32 +62,65 @@ const checkWin = () => {
     return false;
 }
 
+const drawBoard = () => {
+    ctx.fillStyle = '#eeee';
+    ctx.fillRect(0, 0, w, h);
+    ctx.beginPath();
+    // Horizontal.
+    ctx.moveTo(0, h / 3);
+    ctx.lineTo(w, h / 3);
+    ctx.moveTo(0, h * .66);
+    ctx.lineTo(w, h * .66);
+    // Vertical.
+    ctx.moveTo(w / 3, 0);
+    ctx.lineTo(w / 3, h);
+    ctx.moveTo(w * .66, 0);
+    ctx.lineTo(w * .66, h);
+    ctx.closePath();
+    ctx.stroke();
+}
+
+const drawCross = (x, y) => {
+    ctx.beginPath();
+    ctx.moveTo(x * s + p, y * s + p);
+    ctx.lineTo(x * s + s - p, y * s + s - p);
+    ctx.moveTo(x * s + p, y * s + s - p);
+    ctx.lineTo(x * s + s - p, y * s + p);
+    ctx.closePath();
+    ctx.stroke();
+}
+
+const drawCircle = (x, y) => {
+    ctx.beginPath();
+    ctx.arc((x * s) + s / 2, (y * s) + s / 2, s / 2 - p, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.stroke();
+}
+
 const updateDisplay = () => {
-    let index = 0;
     for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
-            cells[index].innerText = game.board[y][x];
-            index++;
+            if (game.board[y][x] === "X")
+                drawCross(x, y);
+            else if (game.board[y][x] === "O")
+                drawCircle(x, y)
+
         }
     }
 }
 
-const reset = async () => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            game = {
-                turn: true,
-                board: [
-                    ['', '', ''],
-                    ['', '', ''],
-                    ['', '', '']
-                ],
-            }
-            resolve();
-            updateDisplay();
-        }, 1000);
-    })
+const reset = () => {
+    game = {
+        turn: true,
+        board: [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', '']
+        ],
+    }
+    updateDisplay();
 }
+
 const stats = { "human": -10, "ai": 10, "tie": 0 };
 const aiMove = () => {
     if (IsBoardFull()) return;
@@ -96,42 +136,17 @@ const aiMove = () => {
     game.turn = !game.turn;
     game.board[move[1]][move[0]] = "O";
 }
-const minimax = (board, isMaximizing, depth) => {
-    const result = checkWin();
-    if (result) return stats[result];
-    if (isMaximizing) {
-        const availablePos = getAvailablePos();
-        let bestScore = -Infinity;
-        for (let pos of availablePos) {
-            board[pos[1]][pos[0]] = "O";
-            score = minimax(board, false, depth - 1);
-            board[pos[1]][pos[0]] = "";
-            bestScore = Math.max(score, bestScore);
-        } return bestScore;
-    } else {
-        const availablePos = getAvailablePos();
-        let bestScore = Infinity;
-        for (let pos of availablePos) {
-            board[pos[1]][pos[0]] = "X";
-            score = minimax(board, true, depth - 1);
-            board[pos[1]][pos[0]] = "";
-            bestScore = Math.min(score, bestScore);
-        } return bestScore;
-    }
-}
 
-
-const humanMove = pos => {
-    const [x, y] = [parseInt(pos[0]), parseInt(pos[1])];
-    if (!IsEmpty(x, y)) return;
+const humanMove = (_x, _y) => {
+    const [x, y] = getIndexPos(_x, _y)
     if (game.turn) {
         game.board[y][x] = "X";
         game.turn = !game.turn;
     }
 }
 
-const update = async pos => {
-    if (game.turn) humanMove(pos);
+const update = async (x, y) => {
+    if (game.turn) humanMove(x, y);
     else {
         console.time();
         aiMove();
@@ -140,14 +155,13 @@ const update = async pos => {
     updateDisplay();
     if (checkWin()) {
         label.innerText = checkWin();
-        await reset();
+        reset();
         updateDisplay();
     }
-    if (!game.turn) update();
+    if (!game.turn) update(x, y);
 }
 
 
-cellsDiv.addEventListener("click", event => {
-    if (event.target.id !== "cells") update(event.target.dataset.pos);
-})
-updateDisplay()
+canvas.addEventListener("click", e => update(e.clientX, e.clientY));
+updateDisplay();
+drawBoard();
