@@ -3,10 +3,6 @@ const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const restartBtn = document.getElementById("restart");
 const label = document.getElementById("label");
-const s = 200; // Size of each cell.
-const p = 40; // Padding
-const [w, h] = [s * 3, s * 3];
-[canvas.width, canvas.height] = [w, h];
 
 ctx.lineCap = 'round';
 ctx.lineWidth = 10;
