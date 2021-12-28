@@ -1,5 +1,5 @@
 const minimax = (board, isMaximizing, depth) => {
-    const result = checkWin();
+    const result = checkWin()[0];
     if (result) return stats[result];
     if (isMaximizing) {
         const availablePos = getAvailablePos();

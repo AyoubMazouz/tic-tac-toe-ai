@@ -1,7 +1,7 @@
 const canvas = document.getElementById("canvas");
 /** @type {CanvasRenderingContext2D} */
 const ctx = canvas.getContext("2d");
-const cellsDiv = document.getElementById("cells");
+const restartBtn = document.getElementById("restart");
 const label = document.getElementById("label");
 const s = 200; // Size of each cell.
 const p = 40; // Padding
@@ -49,22 +49,30 @@ const checkWin = () => {
             if (step >= 3) temp.push(b[j][step - 3]); // Column / Y.
             else temp.push(b[step][j]);               // Row / X.
         }
-        if (areEqual(temp, human)) return "human";
-        else if (areEqual(temp, ai)) return "ai";
-        step++;
-        temp = [];
+        if (areEqual(temp, human))
+            if (step >= 3)
+                return ["human", { start: [0, step], end: [2, step] }];
+            else return ["human", { start: [step, 0], end: [step, 2] }];
+        else if (areEqual(temp, ai))
+            if (step >= 3)
+                return ["ai", { start: [0, step], end: [2, step] }];
+            else return ["ai", { start: [step, 0], end: [step, 2] }];
+        [step, temp] = [step + 1, []];
     } // Diagonal.
-    if (areEqual([b[0][0], b[1][1], b[2][2]], human)) return "human"; // \
-    if (areEqual([b[0][0], b[1][1], b[2][2]], ai)) return "ai";       // \
-    if (areEqual([b[2][0], b[1][1], b[0][2]], human)) return "human"; // /
-    if (areEqual([b[2][0], b[1][1], b[0][2]], ai)) return "ai";       // /
-    if (IsBoardFull()) return "tie";
+    if (areEqual([b[0][0], b[1][1], b[2][2]], human))
+        return ["human", { start: [0, 0], end: [2, 2] }]; // \
+    if (areEqual([b[0][0], b[1][1], b[2][2]], ai))
+        return ["ai", { start: [0, 0], end: [2, 2] }];     // \
+    if (areEqual([b[2][0], b[1][1], b[0][2]], human))
+        return ["human", { start: [0, 2], end: [2, 0] }]; // /
+    if (areEqual([b[2][0], b[1][1], b[0][2]], ai))
+        return ["ai", { start: [0, 2], end: [2, 0] }];      // /
+    if (IsBoardFull()) return ["tie", null];
     return false;
 }
 
 const drawBoard = () => {
-    ctx.fillStyle = '#eeee';
-    ctx.fillRect(0, 0, w, h);
+    ctx.strokeStyle = "#000";
     ctx.beginPath();
     // Horizontal.
     ctx.moveTo(0, h / 3);
@@ -81,6 +89,7 @@ const drawBoard = () => {
 }
 
 const drawCross = (x, y) => {
+    ctx.strokeStyle = "#000";
     ctx.beginPath();
     ctx.moveTo(x * s + p, y * s + p);
     ctx.lineTo(x * s + s - p, y * s + s - p);
@@ -91,39 +100,44 @@ const drawCross = (x, y) => {
 }
 
 const drawCircle = (x, y) => {
+    ctx.strokeStyle = "#000";
     ctx.beginPath();
     ctx.arc((x * s) + s / 2, (y * s) + s / 2, s / 2 - p, 0, Math.PI * 2);
     ctx.closePath();
     ctx.stroke();
 }
 
+const winningLine = () => {
+
+}
+
 const updateDisplay = () => {
+    ctx.fillStyle = "gray";
+    ctx.fillRect(0, 0, w, h);
+    drawBoard();
     for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
             if (game.board[y][x] === "X")
                 drawCross(x, y);
             else if (game.board[y][x] === "O")
-                drawCircle(x, y)
-
+                drawCircle(x, y);
         }
     }
 }
 
 const reset = () => {
-    game = {
-        turn: true,
-        board: [
-            ['', '', ''],
-            ['', '', ''],
-            ['', '', '']
-        ],
-    }
+    debugger
+    game.turn = true;
+    game.board = [
+        ['', '', ''],
+        ['', '', ''],
+        ['', '', '']
+    ];
     updateDisplay();
 }
 
 const stats = { "human": -10, "ai": 10, "tie": 0 };
 const aiMove = () => {
-    if (IsBoardFull()) return;
     const availablePos = getAvailablePos();
     let bestScore = -Infinity;
     let move;
@@ -138,24 +152,20 @@ const aiMove = () => {
 }
 
 const humanMove = (_x, _y) => {
-    const [x, y] = getIndexPos(_x, _y)
-    if (game.turn) {
-        game.board[y][x] = "X";
-        game.turn = !game.turn;
-    }
+    const [x, y] = getIndexPos(_x, _y);
+    if (!IsEmpty(x, y)) return;
+    game.board[y][x] = "X";
+    game.turn = !game.turn;
 }
 
-const update = async (x, y) => {
+const update = (x, y) => {
+    if (IsBoardFull()) return;
     if (game.turn) humanMove(x, y);
-    else {
-        console.time();
-        aiMove();
-        console.timeEnd();
-    }
+    else aiMove();
     updateDisplay();
     if (checkWin()) {
-        label.innerText = checkWin();
-        reset();
+        label.innerText = checkWin()[0];
+        game.over = true;
         updateDisplay();
     }
     if (!game.turn) update(x, y);
@@ -163,5 +173,5 @@ const update = async (x, y) => {
 
 
 canvas.addEventListener("click", e => update(e.clientX, e.clientY));
+restartBtn.addEventListener("click", e => reset());
 updateDisplay();
-drawBoard();
