@@ -7,13 +7,19 @@ const s = 200; // Size of each cell.
 const p = 40; // Padding
 const [w, h] = [s * 3, s * 3];
 [canvas.width, canvas.height] = [w, h];
+
+ctx.lineCap = 'round';
+ctx.lineWidth = 10;
+
 var game = {
     turn: true,
+    over: false,
+    pos: [null, null],
     board: [
         ['', '', ''],
         ['', '', ''],
         ['', '', '']
-    ],
+    ]
 };
 
 const IsEmpty = (x, y) => !game.board[y][x];
@@ -69,58 +75,61 @@ const checkWin = () => {
     if (areEqual([b[2][0], b[1][1], b[0][2]], ai))
         return ["ai", { start: [0, 2], end: [2, 0] }];      // /
     if (IsBoardFull()) return ["tie", null];
-    return false;
+    return [false, null];
+}
+
+const recordPos = (_x, _y) => {
+    console.log('hello')
+    const [x, y] = getIndexPos(_x, _y)
+    game.pos = [x, y];
 }
 
 const drawBoard = () => {
-    ctx.strokeStyle = "#000";
+    ctx.strokeStyle = "#121212";
     ctx.beginPath();
     // Horizontal.
-    ctx.moveTo(0, h / 3);
-    ctx.lineTo(w, h / 3);
-    ctx.moveTo(0, h * .66);
-    ctx.lineTo(w, h * .66);
+    ctx.moveTo(p, h / 3);
+    ctx.lineTo(w - p, h / 3);
+    ctx.moveTo(p, h * .66);
+    ctx.lineTo(w - p, h * .66);
     // Vertical.
-    ctx.moveTo(w / 3, 0);
-    ctx.lineTo(w / 3, h);
-    ctx.moveTo(w * .66, 0);
-    ctx.lineTo(w * .66, h);
-    ctx.closePath();
+    ctx.moveTo(w / 3, p);
+    ctx.lineTo(w / 3, h - p);
+    ctx.moveTo(w * .66, 0 + p);
+    ctx.lineTo(w * .66, h - p);
     ctx.stroke();
 }
 
-const drawCross = (x, y) => {
-    ctx.strokeStyle = "#000";
+const drawCross = (x, y, a) => {
+    if (x === null) return
+    ctx.strokeStyle = `rgba(210, 90, 0, ${a || 1})`;
     ctx.beginPath();
     ctx.moveTo(x * s + p, y * s + p);
     ctx.lineTo(x * s + s - p, y * s + s - p);
     ctx.moveTo(x * s + p, y * s + s - p);
     ctx.lineTo(x * s + s - p, y * s + p);
-    ctx.closePath();
     ctx.stroke();
 }
 
 const drawCircle = (x, y) => {
-    ctx.strokeStyle = "#000";
+    ctx.strokeStyle = "#F05454";
     ctx.beginPath();
     ctx.arc((x * s) + s / 2, (y * s) + s / 2, s / 2 - p, 0, Math.PI * 2);
-    ctx.closePath();
     ctx.stroke();
 }
 
 const winningLine = pos => {
+    if (!pos) return;
     const [x1, y1, x2, y2] = [...pos.start, ...pos.end];
-    console.log(x1, y1, x2, y2)
-    ctx.strokeStyle = "#000";
+    ctx.strokeStyle = "#121212";
     ctx.beginPath();
     ctx.moveTo(x1 * s + s / 2, y1 * s + s / 2);
     ctx.lineTo(x2 * s + s / 2, y2 * s + s / 2);
-    ctx.closePath();
     ctx.stroke();
 }
 
-const updateDisplay = () => {
-    ctx.fillStyle = "gray";
+const draw = () => {
+    ctx.fillStyle = "#F5F5F5";
     ctx.fillRect(0, 0, w, h);
     drawBoard();
     for (let y = 0; y < 3; y++) {
@@ -134,18 +143,21 @@ const updateDisplay = () => {
 }
 
 const reset = () => {
-    debugger
     game.turn = true;
+    game.over = false;
+    game.pos = [null, null];
     game.board = [
         ['', '', ''],
         ['', '', ''],
         ['', '', '']
     ];
-    updateDisplay();
+    requestAnimationFrame(update);
 }
 
 const stats = { "human": -10, "ai": 10, "tie": 0 };
 const aiMove = () => {
+    if (game.over) return;
+    if (IsBoardFull()) return;
     const availablePos = getAvailablePos();
     let bestScore = -Infinity;
     let move;
@@ -160,29 +172,31 @@ const aiMove = () => {
 }
 
 const humanMove = (_x, _y) => {
+    if (game.over) return;
+    if (IsBoardFull()) return;
     const [x, y] = getIndexPos(_x, _y);
     if (!IsEmpty(x, y)) return;
     game.board[y][x] = "X";
     game.turn = !game.turn;
 }
 
-const update = (x, y) => {
-    if (game.over) return;
-    if (IsBoardFull()) return;
-    if (game.turn) humanMove(x, y);
-    else aiMove();
-    updateDisplay();
-    if (checkWin()) {
-        const [winner, pos] = checkWin();
+const update = () => {
+    const [winner, pos] = checkWin();
+    if (winner) {
         label.innerText = winner;
         game.over = true;
-        updateDisplay();
-        winningLine(pos);
     }
-    if (!game.turn) update(x, y);
+    if (!game.turn) aiMove();
+    if (!game.over) {
+        draw();
+        drawCross(game.pos[0], game.pos[1], .1);
+        requestAnimationFrame(update);
+    } else draw();
+    winningLine(pos);
 }
 
 
-canvas.addEventListener("click", e => update(e.clientX, e.clientY));
+canvas.addEventListener("click", e => humanMove(e.clientX, e.clientY));
 restartBtn.addEventListener("click", e => reset());
-updateDisplay();
+canvas.addEventListener("mousemove", e => recordPos(e.clientX, e.clientY));
+requestAnimationFrame(update);
