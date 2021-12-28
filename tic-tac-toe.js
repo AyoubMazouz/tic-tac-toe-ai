@@ -46,17 +46,18 @@ const checkWin = () => {
     let [step, temp] = [0, []];
     for (let i = 0; i < 6; i++) {
         for (let j = 0; j < 3; j++) {
-            if (step >= 3) temp.push(b[j][step - 3]); // Column / Y.
-            else temp.push(b[step][j]);               // Row / X.
+            if (step < 3) temp.push(b[step][j]);    // Row / X.
+            else temp.push(b[j][step - 3]);         // Column / Y.
         }
+
         if (areEqual(temp, human))
-            if (step >= 3)
-                return ["human", { start: [0, step], end: [2, step] }];
-            else return ["human", { start: [step, 0], end: [step, 2] }];
+            if (step < 3) return ["human", { start: [0, step], end: [2, step] }];
+            else return ["human", { start: [step - 3, 0], end: [step - 3, 2] }];
+
         else if (areEqual(temp, ai))
-            if (step >= 3)
-                return ["ai", { start: [0, step], end: [2, step] }];
-            else return ["ai", { start: [step, 0], end: [step, 2] }];
+            if (step < 3) ["ai", { start: [0, step], end: [2, step] }];
+            else return ["ai", { start: [step - 3, 0], end: [step - 3, 2] }];
+
         [step, temp] = [step + 1, []];
     } // Diagonal.
     if (areEqual([b[0][0], b[1][1], b[2][2]], human))
@@ -107,8 +108,15 @@ const drawCircle = (x, y) => {
     ctx.stroke();
 }
 
-const winningLine = () => {
-
+const winningLine = pos => {
+    const [x1, y1, x2, y2] = [...pos.start, ...pos.end];
+    console.log(x1, y1, x2, y2)
+    ctx.strokeStyle = "#000";
+    ctx.beginPath();
+    ctx.moveTo(x1 * s + s / 2, y1 * s + s / 2);
+    ctx.lineTo(x2 * s + s / 2, y2 * s + s / 2);
+    ctx.closePath();
+    ctx.stroke();
 }
 
 const updateDisplay = () => {
@@ -159,14 +167,17 @@ const humanMove = (_x, _y) => {
 }
 
 const update = (x, y) => {
+    if (game.over) return;
     if (IsBoardFull()) return;
     if (game.turn) humanMove(x, y);
     else aiMove();
     updateDisplay();
     if (checkWin()) {
-        label.innerText = checkWin()[0];
+        const [winner, pos] = checkWin();
+        label.innerText = winner;
         game.over = true;
         updateDisplay();
+        winningLine(pos);
     }
     if (!game.turn) update(x, y);
 }
