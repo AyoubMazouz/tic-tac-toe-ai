@@ -1,3 +1,7 @@
+// RESOURCES:
+// https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/
+// https://www.youtube.com/watch?v=l-hh51ncgDI
+
 const minimax = (board, isMaximizing, depth) => {
     const result = checkWin()[0];
     if (result) return stats[result];
