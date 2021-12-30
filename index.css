@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+    .canvas-shadow {
+        box-shadow:  25px 25px 50px #d9d9d9,
+             -25px -25px 50px #ffffff;
+    }
+    .button-shadow {
+        box-shadow:  6px 6px 10px #d9d9d9,
+        -6px -6px 10px #ffffff;
+    }
+}

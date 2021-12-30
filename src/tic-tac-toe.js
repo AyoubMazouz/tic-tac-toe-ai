@@ -8,9 +8,8 @@ ctx.lineCap = 'round';
 ctx.lineWidth = 10;
 
 var game = {
-    turn: true,
-    over: false,
-    pos: [null, null],
+    turn: true, over: false,
+    x: null, y: null,
     board: [
         ['', '', ''],
         ['', '', ''],
@@ -40,6 +39,7 @@ const getIndexPos = (x, y) => {
     const off = canvas.getBoundingClientRect();
     return [(x - off.x) / s | 0, (y - off.y) / s | 0];
 }
+
 
 const checkWin = () => {
     const human = ["X", "X", "X"];
@@ -75,10 +75,10 @@ const checkWin = () => {
 }
 
 const recordPos = (_x, _y) => {
-    console.log('hello')
-    const [x, y] = getIndexPos(_x, _y)
-    game.pos = [x, y];
+    game.pos = [_x, _y];
+    [game.x, game.y] = getIndexPos(_x, _y);
 }
+
 
 const drawBoard = () => {
     ctx.strokeStyle = "#121212";
@@ -124,6 +124,12 @@ const winningLine = pos => {
     ctx.stroke();
 }
 
+const drawHoverCross = (x, y) => {
+    if (x === null) return;
+    if (IsEmpty(x, y))
+        drawCross(x, y, .1);
+}
+
 const draw = () => {
     ctx.fillStyle = "#F5F5F5";
     ctx.fillRect(0, 0, w, h);
@@ -141,7 +147,8 @@ const draw = () => {
 const reset = () => {
     game.turn = true;
     game.over = false;
-    game.pos = [null, null];
+    game.x = null;
+    game.y = null;
     game.board = [
         ['', '', ''],
         ['', '', ''],
@@ -185,14 +192,14 @@ const update = () => {
     if (!game.turn) aiMove();
     if (!game.over) {
         draw();
-        drawCross(game.pos[0], game.pos[1], .1);
+        drawHoverCross(game.x, game.y)
         requestAnimationFrame(update);
     } else draw();
     winningLine(pos);
 }
 
 
-canvas.addEventListener("click", e => humanMove(e.clientX, e.clientY));
 restartBtn.addEventListener("click", e => reset());
+canvas.addEventListener("click", e => humanMove(e.clientX, e.clientY));
 canvas.addEventListener("mousemove", e => recordPos(e.clientX, e.clientY));
 requestAnimationFrame(update);

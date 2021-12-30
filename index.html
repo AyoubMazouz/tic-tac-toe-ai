@@ -6,31 +6,56 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script defer src="./config.js"></script>
-    <script defer src="./minimax.js"></script>
-    <script defer src="./tic-tac-toe.js"></script>
-
-    <style>
-        canvas {
-            border-radius: 5%;
-        }
-    </style>
-
+    <script defer src="./src/config.js"></script>
+    <script defer src="./src/minimax.js"></script>
+    <script defer src="./src/tic-tac-toe.js"></script>
+    <link rel="stylesheet" href="./src/styles.css">
 </head>
 
-<body>
+<body class="flex justify-center text-slate-600 font-['Roboto']">
+    <div class="flex flex-col justify-center items-center w-fit h-screen space-y-6">
 
-    <div style="
-                height: 100vh;
-                display: flex; 
-                justify-content: center;
-                align-items: center;">
+        <!-- Nav -->
+        <div class="absolute top-4 left-12 py-2 px-4 flex gap-4 button-shadow rounded-md">
+            <!-- Projects -->
+            <a class="hover:text-indigo-700" href="#">
+                Projects
+            </a>
+            <div>|</div>
+            <!-- Github -->
+            <a class="hover:text-green-700" href="#">
+                Github
+            </a>
+            <div>|</div>
+            <!-- How To use -->
+            <a class="hover:text-sky-700" href="#">
+                Help
+            </a>
+        </div>
 
-        <div id="label"></div>
-        <div></div>
-        <button id="restart">Restart</button>
+        <!-- Restart / New Game button -->
+        <button class="p-3 bg-white rounded-md self-end button-shadow hover:shadow-none transition-shadow duration-300"
+            id="restart">
+            <img class="h-8" src="./src/restart.svg">
+        </button>
 
-        <canvas id="canvas"></canvas>
+        <!-- Tic-Tac-Toe -->
+        <canvas class="canvas-shadow rounded-3xl" id="canvas"></canvas>
+
+        <div class="flex justify-around items-center w-full px-4 text-xl">
+            <div class="flex flex-col items-center">
+                <div class="text-2xl" id="player-score">0</div>
+                <div>YOU</div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="text-2xl" id="player-score">0</div>
+                <div>TIES</div>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="text-2xl" id="ai-score">0</div>
+                <div>AI</div>
+            </div>
+        </div>
 
     </div>
 
