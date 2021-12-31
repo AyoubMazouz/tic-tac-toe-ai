@@ -146,7 +146,7 @@ const winningLine = pos => {
 
 const drawHoverCross = (x, y) => {
     if (x === null) return;
-    if (IsEmpty(x, y)) drawCross(x, y, colors.X);
+    if (IsEmpty(x, y)) drawCross(x, y, colors.XHover);
 }
 
 const draw = () => {
@@ -187,7 +187,7 @@ const updateScores = winner => {
 // ####################################################
 // ############ MAIN FUNCTIONS ########################
 // ####################################################
-const aiMove = async () => {
+const aiMove = async (delay = 0) => {
     return new Promise(resolve => {
         setTimeout(() => {
             if (game.over) return;
@@ -209,7 +209,7 @@ const aiMove = async () => {
             game.turn = !game.turn;
             game.board[move[1]][move[0]] = "O";
             resolve();
-        }, 0);
+        }, delay);
     })
 }
 
@@ -233,7 +233,10 @@ const update = async () => {
         game.over = true;
     }
     // If ai turn.
-    if (!game.turn) await aiMove();
+    if (!game.turn) {
+        if (getAvailablePos() > 7) await aiMove();
+        else await aiMove(300);
+    }
 
     if (!game.over) {
         draw();

@@ -12,6 +12,7 @@ canvas.height = h;
 const colors = {
     board: "rgba(0, 0, 0, .1)",
     X: "rgb(16, 185, 129)",
+    XHover: "rgba(16, 185, 129, .1)",
     O: "#e11d48",
     line: "#0ea5e9",
     bg: "#ffff",
