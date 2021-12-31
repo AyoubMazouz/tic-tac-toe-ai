@@ -97,7 +97,7 @@ const recordPos = (_x, _y) => {
 // ####################################################
 const drawBoard = () => {
     // Draw to horizontal & two vertical lines.
-    ctx.strokeStyle = "rgba(0, 0, 0, .1)";
+    ctx.strokeStyle = colors.board;
     ctx.lineWidth = 5;
     ctx.beginPath();
     // Horizontal.
@@ -113,10 +113,10 @@ const drawBoard = () => {
     ctx.stroke();
 }
 
-const drawCross = (x, y, a) => {
+const drawCross = (x, y, c) => {
     if (x === null) return
     ctx.lineWidth = 25;
-    ctx.strokeStyle = `rgba(16, 185, 129, ${a || 1})`;
+    ctx.strokeStyle = c;
     ctx.beginPath();
     ctx.moveTo(x * s + p, y * s + p);
     ctx.lineTo(x * s + s - p, y * s + s - p);
@@ -125,8 +125,8 @@ const drawCross = (x, y, a) => {
     ctx.stroke();
 }
 
-const drawCircle = (x, y) => {
-    ctx.strokeStyle = "#e11d48";
+const drawCircle = (x, y, c) => {
+    ctx.strokeStyle = c;
     ctx.lineWidth = 25;
     ctx.beginPath();
     ctx.arc((x * s) + s / 2, (y * s) + s / 2, s / 2 - p, 0, Math.PI * 2);
@@ -137,7 +137,7 @@ const winningLine = pos => {
     if (!pos) return;
     const [x1, y1, x2, y2] = [...pos.start, ...pos.end];
     ctx.lineWidth = 25;
-    ctx.strokeStyle = "#0ea5e9";
+    ctx.strokeStyle = colors.line;
     ctx.beginPath();
     ctx.moveTo(x1 * s + s / 2, y1 * s + s / 2);
     ctx.lineTo(x2 * s + s / 2, y2 * s + s / 2);
@@ -146,18 +146,18 @@ const winningLine = pos => {
 
 const drawHoverCross = (x, y) => {
     if (x === null) return;
-    if (IsEmpty(x, y)) drawCross(x, y, .1);
+    if (IsEmpty(x, y)) drawCross(x, y, colors.X);
 }
 
 const draw = () => {
     // Clear canvas.
-    ctx.fillStyle = "#ffff";
+    ctx.fillStyle = colors.bg;
     ctx.fillRect(0, 0, w, h);
     drawBoard();
     for (let y = 0; y < 3; y++) {
         for (let x = 0; x < 3; x++) {
-            if (game.board[y][x] === "X") drawCross(x, y);
-            else if (game.board[y][x] === "O") drawCircle(x, y);
+            if (game.board[y][x] === "X") drawCross(x, y, colors.X);
+            else if (game.board[y][x] === "O") drawCircle(x, y, colors.O);
         }
     }
 }

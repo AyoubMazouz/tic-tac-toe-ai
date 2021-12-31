@@ -17,6 +17,7 @@
 
         <!-- Nav -->
         <div class="absolute top-4 left-12 py-2 px-4 flex gap-4 button-shadow rounded-md">
+
             <!-- Projects -->
             <a class="hover:text-indigo-700" href="#">
                 Projects
@@ -31,34 +32,41 @@
             <a class="hover:text-sky-700" href="#">
                 Help
             </a>
+
         </div>
 
-        <!-- Restart / New Game button -->
-        <button class="p-3 bg-white rounded-md self-end button-shadow hover:shadow-none transition-shadow duration-300"
-            id="restart">
-            <img class="h-8" src="./src/restart.svg">
-        </button>
+
+        <div class="grid grid-cols-3 w-full px-4 text-xl">
+
+            <!-- player -->
+            <div class="flex flex-col items-center justify-self-start">
+                <div class="text-3xl text-green-500" id="player-score">0</div>
+                <div>YOU</div>
+            </div>
+            <!-- ai -->
+            <div class="flex flex-col items-center  justify-self-center">
+                <div class="text-3xl text-rose-500" id="ai-score">0</div>
+                <div>AI</div>
+            </div>
+            <div class="flex gap-4 justify-self-end">
+                <!-- ties -->
+                <div class="flex flex-col items-center">
+                    <div class="text-3xl text-sky-500" id="ties">0</div>
+                    <div>TIES</div>
+
+                </div>
+                <!-- Restart / New Game button -->
+                <button
+                    class="p-3 bg-white rounded-full self-end button-shadow hover:shadow-none transition-shadow duration-300"
+                    id="restart">
+                    <img class="h-10 transition-transform duration-300 hover:-rotate-180" src="./src/restart.svg">
+                </button>
+            </div>
+
+        </div>
 
         <!-- Tic-Tac-Toe -->
         <canvas class="canvas-shadow rounded-3xl" id="canvas"></canvas>
-
-        <div class="flex justify-around items-center w-full px-4 text-xl">
-            <!-- player -->
-            <div class="flex flex-col items-center">
-                <div class="text-3xl text-rose-500" id="player-score">0</div>
-                <div>YOU</div>
-            </div>
-            <!-- ties -->
-            <div class="flex flex-col items-center">
-                <div class="text-3xl text-sky-500" id="ties">0</div>
-                <div>TIES</div>
-            </div>
-            <!-- ai -->
-            <div class="flex flex-col items-center">
-                <div class="text-3xl text-green-500" id="ai-score">0</div>
-                <div>AI</div>
-            </div>
-        </div>
 
     </div>
 
